@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Школа Синкагэ-рю - Каэси</title>
+<title>РЁРєРѕР»Р° РЎРёРЅРєР°РіСЌ-СЂСЋ - РљР°СЌСЃРё</title>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
 <SCRIPT language="JavaScript">
 if (document.images)
@@ -43,7 +43,7 @@ document.images.Oneshow.src = document.Oneslideform.Oneslide[Onecurrent].value;
 document.Oneslideform.Oneslide.selectedIndex = Onecurrent;
 }
 function Oneap(text) {
-document.Oneslideform.Oneslidebutton.value = (text == "Стоп") ? "Слайдшоу" : "Стоп";
+document.Oneslideform.Oneslidebutton.value = (text == "РЎС‚РѕРї") ? "РЎР»Р°Р№РґС€РѕСѓ" : "РЎС‚РѕРї";
 Onerotate();
 }
 function Onechange() {
@@ -51,7 +51,7 @@ Onecurrent = document.Oneslideform.Oneslide.selectedIndex;
 document.images.Oneshow.src = document.Oneslideform.Oneslide[Onecurrent].value;
 }
 function Onerotate() {
-if (document.Oneslideform.Oneslidebutton.value == "Стоп") {
+if (document.Oneslideform.Oneslidebutton.value == "РЎС‚РѕРї") {
 Onecurrent = (Onecurrent == document.Oneslideform.Oneslide.length-1) ? 0 : Onecurrent+1;
 document.images.Oneshow.src = document.Oneslideform.Oneslide[Onecurrent].value;
 document.Oneslideform.Oneslide.selectedIndex = Onecurrent;
@@ -62,20 +62,20 @@ window.setTimeout("Onerotate()", Onerotate_delay);
 </head>
 <body background="background.jpg">
 <div align=center>
-<div align=center class="header">Каэси</div>
+<div align=center class="header">РљР°СЌСЃРё</div>
 <FORM name=Oneslideform>
 <div align=center><img src="kaeshi1.gif" name=Oneshow width="455" height=345 border=0></div>
 <div align=center class="normal">
 <SELECT onchange=Onechange(); name=Oneslide style="BORDER-BOTTOM: 1px solid; BORDER-LEFT: 1px solid; BORDER-RIGHT: 1px solid; BORDER-TOP: 1px solid; background-color:#EBE6DE;"> 
-<OPTION value=kaeshi1.gif selected>Шаг 1</OPTION>
-<OPTION value=kaeshi2.gif>Шаг 2</OPTION>
-<OPTION value=kaeshi3.gif>Шаг 3</OPTION>
-<OPTION value=kaeshi4.gif>Шаг 4</OPTION>
+<OPTION value=kaeshi1.gif selected>РЁР°Рі 1</OPTION>
+<OPTION value=kaeshi2.gif>РЁР°Рі 2</OPTION>
+<OPTION value=kaeshi3.gif>РЁР°Рі 3</OPTION>
+<OPTION value=kaeshi4.gif>РЁР°Рі 4</OPTION>
 </SELECT>
 <table width="200" border="0">
 <tr>
 <td align="left"><INPUT title=Previous onclick=Oneprevious(); type=button value="<<" style="cursor:hand; background-color:#CAB6A2; border-style:solid; border-width:1;"></td>
-<td align="center" width="80"><INPUT title=AutoPlay onclick=Oneap(this.value); type=button value=Слайдшоу name=Oneslidebutton style="cursor:hand; background-color:#CAB6A2; border-style:solid; border-width:1;"></td>
+<td align="center" width="80"><INPUT title=AutoPlay onclick=Oneap(this.value); type=button value=РЎР»Р°Р№РґС€РѕСѓ name=Oneslidebutton style="cursor:hand; background-color:#CAB6A2; border-style:solid; border-width:1;"></td>
 <td align="right"><INPUT title=Next onclick=Onenext(); type=button value=">>" style="cursor:hand; background-color:#CAB6A2; border-style:solid; border-width:1;"></td>
 </tr>
 </table>
