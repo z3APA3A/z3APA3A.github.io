@@ -1,0 +1,121 @@
+{% set Title = "security.nnov.ru / securityvulns.ru redirects" %}
+{% include "../include/intro.html" %}
+<script>
+(function() {
+  'use strict';
+
+  var path = location.hash.substring(1).replace(/^\//, '');
+  if (!path) {
+    location.href = 'https://3proxy.ru/';
+    return;
+  }
+
+  // Match path against all known URL patterns.
+  // Returns { type, id } or null.
+  function matchPath(p) {
+    var m;
+
+    // CVE
+    m = p.match(/^CVE-(\d{4})-(\d{4})\.html$/i);
+    if (m) return { type: 'cve', id: 'CVE-' + m[1] + '-' + m[2] };
+
+    // {letter}document{docid}.html  —  offset-based document
+    m = p.match(/^([A-Za-z])document(\d+)\.html$/);
+    if (m) {
+      var dId = parseInt(m[2], 10) + (m[1].charCodeAt(0) - 65) * 1000;
+      return { type: 'document', id: dId };
+    }
+
+    // {letter}news{binid}.html  —  offset-based news
+    m = p.match(/^([A-Za-z])news(\d+)\.html$/);
+    if (m) {
+      var nId = parseInt(m[2], 10) + (m[1].charCodeAt(0) - 65) * 1000;
+      return { type: 'news', id: nId };
+    }
+
+    // docs/{id}.html  →  redirect to docs{id}.html  →  document
+    m = p.match(/^docs\/(\d+)\.html$/);
+    if (m) return { type: 'document', id: parseInt(m[1], 10) };
+
+    // docs{id}.html  —  direct document
+    m = p.match(/^docs(\d+)\.html$/);
+    if (m) return { type: 'document', id: parseInt(m[1], 10) };
+
+    // document{id}.html  →  redirect to docs{id}.html  →  document
+    m = p.match(/^document(\d+)\.html$/);
+    if (m) return { type: 'document', id: parseInt(m[1], 10) };
+
+    // search/document.asp?docid={id}  →  docs{id}.html  →  document
+    m = p.match(/^search\/document\.asp\?docid=(\d+)$/);
+    if (m) return { type: 'document', id: parseInt(m[1], 10) };
+
+    // news/{name}.html  —  news by binname
+    m = p.match(/^news\/(.+)\.html$/);
+    if (m) return { type: 'news', id: m[1] };
+
+    // board{id}.html  →  redirect to news{id}.html
+    m = p.match(/^board(\d+)\.html$/);
+    if (m) return { type: 'news', id: parseInt(m[1], 10) };
+
+    // news{id}.html  —  direct news by binid
+    m = p.match(/^news(\d+)\.html$/);
+    if (m) return { type: 'news', id: parseInt(m[1], 10) };
+
+    // search/news.asp?binid={id}  →  news{id}.html
+    m = p.match(/^search\/news\.asp\?binid=(\d+)$/);
+    if (m) return { type: 'news', id: parseInt(m[1], 10) };
+
+    // soft/{id}.html  —  soft (no vulners mapping → 3proxy)
+    m = p.match(/^soft\/(\d+)\.html$/);
+    if (m) return { type: 'soft', id: m[1] };
+
+    // soft{id}.html  →  redirect to soft/{id}.html
+    m = p.match(/^soft(\d+)\.html$/);
+    if (m) return { type: 'soft', id: m[1] };
+
+    // search/soft.asp?softid={id}  →  soft/{id}.html
+    m = p.match(/^search\/soft\.asp\?softid=(\d+)$/);
+    if (m) return { type: 'soft', id: m[1] };
+
+    // source/{name}.html  —  source by name
+    m = p.match(/^source\/(.+)\.html$/);
+    if (m) return { type: 'source', id: m[1] };
+
+    // source{id}.html  —  source by id
+    m = p.match(/^source(\d+)\.html$/);
+    if (m) return { type: 'source', id: m[1] };
+
+    // search/source.asp?sourceid={id}
+    m = p.match(/^search\/source\.asp\?sourceid=(\d+)$/);
+    if (m) return { type: 'source', id: m[1] };
+
+    // search/source.asp?souname={name}
+    m = p.match(/^search\/source\.asp\?souname=(.+)$/);
+    if (m) return { type: 'source', id: m[1] };
+
+    return null;
+  }
+
+  var result = matchPath(path);
+  if (!result && !/\.html$/i.test(path)) {
+    result = matchPath(path + '.html');
+  }
+
+  if (result) {
+    switch (result.type) {
+      case 'cve':
+        location.href = 'https://vulners.com/cve/' + result.id;
+        return;
+      case 'document':
+        location.href = 'https://vulners.com/securityvulns/SECURITYVULNS:DOC:' + result.id;
+        return;
+      case 'news':
+        location.href = 'https://vulners.com/securityvulns/SECURITYVULNS:VULN:' + result.id;
+        return;
+    }
+  }
+
+  location.href = 'https://3proxy.ru/';
+})();
+</script>
+{% include "../include/postpage.html" %}
