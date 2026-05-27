@@ -150,8 +150,9 @@ $(document).ready(function() {
     <li><a href="#NAMES">Как разрешать имена на родительском прокси?</a></li>
     <li><a href="#ISFTP">Как настроить FTP прокси?</a></li>
     <li><a href="#TLSPR">Как настроить SNI proxy (tlspr)</a></li>
-    <li><a href="#SSLPLUGIN">Как настроить TLS/SSL с помощью SSLPlugin (https прокси, mTLS)</a></li>
-    <li><a href="#CERTIFICATES">Как создать CA и сертификаты для SSLPlugin</a></li>
+    <li><a href="#SSLPLUGIN">Как настроить TLS/SSL (https прокси, mTLS)</a></li>
+    <li><a href="#CERTIFICATES">Как создать CA и сертификаты для SSL</a></li>
+    <li><a href="#PCRE">Как использовать PCRE-фильтрацию (регулярные выражения)</a></li>
     <li><a href="#AUTH">Как ограничить доступ к службе</a>
     <li><a href="#USERS">Как создать список пользователей</a>
     <li><a href="#ACL">Как ограничить доступ пользователей к ресурсам</a>
@@ -765,9 +766,12 @@ proxy
 </pre>
   </p>
 
-  <li><a name="SSLPLUGIN"><i>Как настроить TLS/SSL с помощью SSLPlugin (https прокси, mTLS)</i></a>
+  <li><a name="SSLPLUGIN"><i>Как настроить TLS/SSL (https прокси, mTLS)</i></a>
 <p>
-SSLPlugin обеспечивает поддержку TLS/SSL для 3proxy. Он может использоваться для:
+Начиная с версии 0.9.7 поддержка TLS/SSL встроена в 3proxy при компиляции с OpenSSL
+(WITH_SSL). Ранее доступная как SSLPlugin, функциональность теперь интегрирована
+в основной бинарный файл. Строка plugin больше не нужна.
+TLS/SSL может использоваться для:
 <ul>
 <li>Создания https:// прокси (TLS-шифрованное соединение между клиентом и прокси)</li>
 <li>Реализации MITM для инспекции TLS-трафика</li>
@@ -780,7 +784,6 @@ SSLPlugin обеспечивает поддержку TLS/SSL для 3proxy. О�
 <br>Для создания https:// прокси требуется сертификат и ключ сервера. Сертификат не должен быть самоподписанным
 и должен содержать альтернативные имена (SAN) для имени хоста/IP прокси.
 </p><pre>
-plugin /path/to/SSLPlugin.ld.so ssl_plugin
 ssl_server_cert /etc/3proxy/certs/server.crt
 ssl_server_key /etc/3proxy/certs/server.key
 ssl_serv
@@ -796,7 +799,6 @@ proxy -p3128
 <b>Аутентификация по клиентскому сертификату (mTLS):</b>
 <br>Чтобы требовать от клиентов аутентификацию по сертификату, используйте ssl_server_verify и укажите CA-сертификат:
 </p><pre>
-plugin /path/to/SSLPlugin.ld.so ssl_plugin
 ssl_server_cert /etc/3proxy/certs/server.crt
 ssl_server_key /etc/3proxy/certs/server.key
 ssl_server_ca_file /etc/3proxy/certs/ca.crt
@@ -811,7 +813,6 @@ proxy -p3129
 <b>MITM для инспекции TLS-трафика:</b>
 <br>Для перехвата и расшифровки TLS-трафика требуется CA-сертификат для генерации подделанных серверных сертификатов:
 </p><pre>
-plugin /path/to/SSLPlugin.ld.so ssl_plugin
 ssl_server_ca_file /etc/3proxy/certs/ca.crt
 ssl_server_ca_key /etc/3proxy/certs/ca.key
 ssl_client_verify
@@ -829,7 +830,6 @@ CA-сертификат должен быть доверенным для кли
 <b>TLS-клиент (соединение с вышестоящим сервером через TLS):</b>
 <br>Для соединения с вышестоящими серверами через TLS с аутентификацией по клиентскому сертификату:
 </p><pre>
-plugin /path/to/SSLPlugin.ld.so ssl_plugin
 ssl_client_cert /etc/3proxy/certs/client.crt
 ssl_client_key /etc/3proxy/certs/client.key
 ssl_client_verify
@@ -841,7 +841,6 @@ proxy -p3128
 <b>Условное TLS для parent прокси (ssl_client_mode 3):</b>
 <br>При ssl_client_mode 3 TLS-рукопожатие с родительским прокси выполняется только если тип parent прокси заканчивается на 's' (защищённые типы). Это позволяет смешивать защищённые и незащищённые родительские прокси в одной конфигурации:
 </p><pre>
-plugin /path/to/SSLPlugin.ld.so ssl_plugin
 ssl_server_cert /etc/3proxy/certs/server.crt
 ssl_server_key /etc/3proxy/certs/server.key
 ssl_client_mode 3
@@ -860,7 +859,7 @@ ssl_nocli
 <p>
 Создаётся HTTPS-прокси (ssl_serv), принимающий TLS-соединения от клиентов. Для соединений с родительским прокси трафик user1 идёт через https родитель с TLS-шифрованием (защищённый тип), а трафик user2 — через обычный socks5 родитель без TLS. Защищённые типы parent прокси: tcps, https, connects, connect+s, socks4s, socks5s, socks4+s, socks5+s, pop3s, smtps, ftps.
 </p>
-  <li><a name="CERTIFICATES"><i>Как создать CA и сертификаты для SSLPlugin</i></a>
+  <li><a name="CERTIFICATES"><i>Как создать CA и сертификаты для SSL</i></a>
 <p>
 <b>Создание удостоверяющего центра (CA):</b>
 <br>Для MITM или mTLS требуется CA. Сгенерируйте закрытый ключ CA и сертификат:
@@ -975,6 +974,66 @@ openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key \
 openssl pkcs12 -export -out client.p12 -passout pass: \
     -inkey client.key -in client.crt -certfile ca.crt
 </pre>
+
+  <li><a name="PCRE"><i>Как использовать PCRE-фильтрацию (регулярные выражения)</i></a>
+<p>
+Начиная с версии 0.9.7 фильтрация PCRE встроена в 3proxy при компиляции с поддержкой
+PCRE2 (WITH_PCRE). Ранее доступная как PCREPlugin, функциональность теперь интегрирована
+в основной бинарный файл. Строка plugin больше не нужна.
+</p>
+<p>
+PCRE-фильтрация может использоваться для создания правил поиска и замены с регулярными
+выражениями для запросов клиентов, заголовков клиента и сервера, а также данных.
+</p>
+<p>
+<b>Команды:</b>
+</p><pre>
+pcre TYPE FILTER_ACTION REGEXP [ACE]
+pcre_rewrite TYPE FILTER_ACTION REGEXP REWRITE_EXPRESSION [ACE]
+pcre_extend FILTER_ACTION [ACE]
+pcre_options OPTION1 [...]
+</pre>
+<p>
+<ul>
+<li><b>TYPE</b> - тип фильтруемых данных (список через запятую):
+ <ul>
+ <li><b>request</b> - содержимое запроса клиента (например, строка HTTP GET-запроса)
+ <li><b>cliheader</b> - содержимое заголовков запроса клиента
+ <li><b>srvheader</b> - содержимое заголовков ответа сервера
+ <li><b>clidata</b> - данные полученные от клиента (например, данные POST-запроса)
+ <li><b>srvdata</b> - данные полученные от сервера (например, HTML-страница)
+ </ul>
+<li><b>FILTER_ACTION</b> - действие при совпадении:
+ <ul>
+ <li><b>allow</b> - разрешить запрос без проверки остальных правил
+ <li><b>deny</b> - запретить запрос без проверки остальных правил
+ <li><b>dunno</b> - продолжить проверку правил (полезно для pcre_rewrite)
+ </ul>
+<li><b>REGEXP</b> - регулярное выражение PCRE (Perl). Используйте * если проверка не требуется.
+<li><b>REWRITE_EXPRESSION</b> - строка замены. Может содержать Perl-подстановки
+$1, $2 и т.д. $0 - вся найденная подстрока. \r и \n для вставки новых строк.
+<li><b>ACE</b> - элемент списка контроля доступа (имена пользователей, IP источника,
+IP назначения, порты и т.д.), аналогичный командам allow/deny/bandlimin.
+Регулярное выражение проверяется только при совпадении ACL с данными соединения.
+</ul>
+</p>
+<p>
+<b>Примеры:</b>
+</p><pre>
+# Блокировать запросы с определёнными ключевыми словами для некоторых пользователей
+pcre request deny "porn|sex" user1,user2,user3 192.168.0.0/16
+
+# Блокировать ответы с определённым content-type
+pcre srvheader deny "Content-type: application"
+
+# Замена содержимого в обоих направлениях (цензура)
+pcre_rewrite clidata,srvdata dunno "porn|sex|pussy" "***" baduser
+pcre_extend deny * 192.168.0.1/16
+</pre>
+<p>
+<b>Примечание:</b> Регулярные выражения не требуют авторизации и не могут заменить
+авторизацию и/или ACL allow/deny.
+</p>
 
   <li><a name="AUTH"><i>Как ограничить доступ к службе</i></a>
   <p>

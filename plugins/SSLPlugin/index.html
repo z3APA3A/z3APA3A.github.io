@@ -116,9 +116,13 @@ $(document).ready(function() {
   
 });
   </script>
-<h3>3proxy SSL/TLS плагин</h3>
+<h3>3proxy SSL/TLS поддержка</h3>
 
-Плагин можно использовать для перехвата и дешифровки SSL/TLS трафика, для шифрования трафика прокси-сервера и аутентификации с помощью клиентских сертификатов.
+<p><b>Примечание:</b> Начиная с версии 0.9.7 поддержка SSL/TLS встроена в 3proxy и не требует
+отдельного плагина. Все команды ssl_* доступны напрямую при компиляции 3proxy с поддержкой
+OpenSSL (WITH_SSL). Строка plugin больше не нужна.</p>
+
+<p>Плагин можно использовать для перехвата и дешифровки SSL/TLS трафика, для шифрования трафика прокси-сервера и аутентификации с помощью клиентских сертификатов.</p>
 
 <h4>Для прозрачного перехвата трафика (MITM):</h4>
 
@@ -170,7 +174,6 @@ ssl_server_ca_key и ssl_server_key соответственно, если он�
 
 <h4>Пример MITM:</h4>
 <pre>
-plugin /path/to/SSLPlugin.so ssl_plugin
 ssl_server_ca_file /path/to/cafile
 ssl_server_ca_key /path/to/cakey
 ssl_mitm
@@ -182,7 +185,6 @@ proxy -p3129
 
 <h4>Пример конфигурации https:// прокси:</h4>
 <pre>
-plugin /path/to/SSLPlugin.so ssl_plugin
 ssl_server_cert path_to_cert
 ssl_server_key path_to_key
 ssl_serv
@@ -194,7 +196,6 @@ proxy -p3128
 
 <h4>Пример TLS-клиента (соединение к вышестоящему серверу через TLS):</h4>
 <pre>
-plugin /path/to/SSLPlugin.so ssl_plugin
 ssl_client_cert /path/to/client.crt
 ssl_client_key /path/to/client.key
 ssl_client_verify
@@ -206,7 +207,6 @@ proxy -p3128
 
 <h4>Условное TLS для parent прокси (ssl_client_mode 3):</h4>
 <pre>
-plugin /path/to/SSLPlugin.so ssl_plugin
 ssl_server_cert /path/to/server.crt
 ssl_server_key /path/to/key
 ssl_client_mode 3
@@ -226,7 +226,6 @@ ssl_nocli
 
 <h4>Пример mTLS (требование клиентского сертификата):</h4>
 <pre>
-plugin /path/to/SSLPlugin.so ssl_plugin
 ssl_server_cert /path/to/server.crt
 ssl_server_key /path/to/server.key
 ssl_server_ca_file /path/to/ca.crt
