@@ -10,7 +10,7 @@
 	<script src="/js/bootstrap.bundle.min.js"></script>
 	<link rel="stylesheet" href="/style/main.css">
         <title>
-3proxy : Документация : smtpp.8
+3proxy : Документация : imapp.8
 	</title>
 
 	<meta name="keywords" content="3proxy, proxy, прокси, free, бесплатный, прокси сервер, socks, FTP, HTTP">
@@ -122,7 +122,7 @@ $(document).ready(function() {
 </head>
 <body>
 
-<h1 align="center">smtpp</h1>
+<h1 align="center">imapp</h1>
 
 <a href="#NAME">NAME</a><br>
 <a href="#SYNOPSIS">SYNOPSIS</a><br>
@@ -141,15 +141,15 @@ $(document).ready(function() {
 </h2>
 
 
-<p style="margin-left:6%; margin-top: 1em"><b>smtpp</b> -
-SMTP proxy gateway service</p>
+<p style="margin-left:6%; margin-top: 1em"><b>imapp</b> -
+IMAPv4 proxy gateway service</p>
 
 <h2>SYNOPSIS
 <a name="SYNOPSIS"></a>
 </h2>
 
 
-<p style="margin-left:6%; margin-top: 1em"><b>smtpp</b>
+<p style="margin-left:6%; margin-top: 1em"><b>imapp</b>
 [<b>-d</b>] [<b>-l</b>[[<i>@</i>]<i>logfile</i>]]
 [<b>-p</b><i>port</i>] [<b>-i</b><i>internal_ip</i>]
 [<b>-e</b><i>external_ip</i>]
@@ -161,9 +161,9 @@ SMTP proxy gateway service</p>
 
 
 
-<p style="margin-left:6%; margin-top: 1em"><i><b>smtpp</b></i>
-is SMTP gateway service to allow internal users to access
-external SMTP servers.</p>
+<p style="margin-left:6%; margin-top: 1em"><i><b>imapp</b></i>
+is IMAPv4 (IMAP4rev1) gateway service to allow internal
+users to access external IMAP servers.</p>
 
 <h2>OPTIONS
 <a name="OPTIONS"></a>
@@ -271,7 +271,7 @@ file path (e.g. <i>/var/run/netns/myns</i> or
 connections to. By default, connections to any interface are
 accepted. It&acute;s usually unsafe. Unix domain sockets can
 be specified with <i>-iunix:/path/to/socket</i> syntax
-(e.g., -iunix:/var/run/smtpp.sock). On Linux, abstract
+(e.g., -iunix:/var/run/imapp.sock). On Linux, abstract
 sockets use <i>-iunix:@socketname</i> syntax.</p></td></tr>
 <tr valign="top" align="left">
 <td width="6%"></td>
@@ -284,7 +284,7 @@ sockets use <i>-iunix:@socketname</i> syntax.</p></td></tr>
 
 
 <p style="margin-top: 1em">Port. Port proxy listens for
-incoming connections. Default is 587.</p></td></tr>
+incoming connections. Default is 143.</p></td></tr>
 <tr valign="top" align="left">
 <td width="6%"></td>
 <td width="3%">
@@ -308,7 +308,7 @@ used if the target address is not specified by the user.</p></td></tr>
 
 
 <p style="margin-top: 1em">Disable STARTTLS support.
-STARTTLS is not announced in the EHLO response and the
+STARTTLS is not announced in the CAPABILITY response and the
 STARTTLS command is not accepted.</p></td></tr>
 <tr valign="top" align="left">
 <td width="6%"></td>
@@ -345,21 +345,27 @@ You may want to try something like -S8192 if you experience
 
 
 <p style="margin-left:6%; margin-top: 1em">You can use any
-MUA (Mail User Agent) with SMTP authentication support. Set
-the client to use <i>internal_ip</i> and <i>port</i> as an
-SMTP server. The address of the real SMTP server must be
-configured as a part of the SMTP username. The format for
-the username is <i>username</i>@<i>server</i>, where
-<i>server</i> is the address of the SMTP server and
-<i>username</i> is the user&acute;s login on this SMTP
-server. The login itself may contain an &acute;@&acute;
-sign. Only cleartext authentication is supported, because
-challenge-response authentication (CRAM-MD5, SPA, etc.)
-requires a challenge from the server before we know which
-server to connect to. When running as a 3proxy service (not
-as a standalone binary), STARTTLS is supported and announced
-in the EHLO response unless disabled with <b>-x</b>. After
-the client issues STARTTLS, the connection is handled by
+MUA (Mail User Agent) with IMAPv4 support. Set the client to
+use <i>internal_ip</i> and <i>port</i> as an IMAP server.
+The address of the real IMAP server must be configured as a
+part of the IMAP username. The format for the username is
+<i>username</i>@<i>server</i>, where <i>server</i> is the
+address of the IMAP server and <i>username</i> is the
+user&acute;s login on this IMAP server. The login itself may
+contain an &acute;@&acute; sign. Supported client
+authentication methods are the LOGIN command, AUTHENTICATE
+PLAIN and AUTHENTICATE LOGIN. With the server, the proxy
+authenticates using the method chosen by the client if the
+server supports it (as advertised in the CAPABILITY
+response); otherwise it falls back to AUTHENTICATE LOGIN,
+AUTHENTICATE PLAIN or the LOGIN command, in this order of
+preference. Challenge-response authentication (CRAM-MD5,
+etc.) is not supported, because it requires a challenge from
+the server before we know which server to connect to. When
+running as a 3proxy service (not as a standalone binary),
+STARTTLS is supported and announced in the CAPABILITY
+response unless disabled with <b>-x</b>. After the client
+issues STARTTLS, the connection is handled by
 <b>tlspr</b>(8): the destination host is taken from the SNI
 of the client TLS handshake (or from the -h option), the
 proxy performs STARTTLS negotiation with the destination
@@ -382,8 +388,8 @@ to <b>3proxy@3proxy.org</b></p>
 
 
 <p style="margin-left:6%; margin-top: 1em">3proxy(8),
-ftppr(8), proxy(8), socks(8), tcppm(8), udppm(8),
-syslogd(8), <br>
+ftppr(8), pop3p(8), proxy(8), smtpp(8), socks(8), tcppm(8),
+tlspr(8), udppm(8), syslogd(8), <br>
 https://3proxy.org/</p>
 
 <h2>AUTHORS
