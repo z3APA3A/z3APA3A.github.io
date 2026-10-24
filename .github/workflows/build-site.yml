@@ -38,6 +38,7 @@ jobs:
     - name: Build
       env:
        TITLE_PREFIX: "3proxy : Документация"
+       SITE_LANG: ru
       run: python3 site/tools/buildsite.py 3proxy site
 
     - name: Commit
